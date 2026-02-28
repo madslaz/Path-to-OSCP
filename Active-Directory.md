@@ -21,3 +21,13 @@
 
 ## Introduction to AD Attack Tools
 ### Mimikatz
+* If you need to dump domain passwords, Mimikatz is a powerful tool. It's designed to extract plaintext passwords, hashes, PIN codes, and Kerberos tickets from memory. It works particularly well with extracting from the LSASS process as it can effectively access it to obtain encrypted data, such as user passwords and access tokens. After extracting plaintext or NTLM password hashes, you can use Mimikatz to spawn processes or run DCSync attacks to impersonate the DC with the KRBTGT (Kerberos Ticket-Granting Ticket) hash.
+
+#### LAB: Introduction to Mimikatz
+* Mimikatz is an open-source post-exploitation tool designed for Windows systems. It allows attackers to extract sensitive authentication data such as passwords, tokens, and hashes directly from a system's memory. These extracted credentials can then be used in offline password-cracking attacks or leveraged for further network exploitation, such as pass-the-hash, pass-the-ticket, or even generating Golden Kerberos tickets, which provide extended access to systems.
+* Initially developed by Benjamin Delpy as a proof of concept, Mimikatz was created to demonstrate the vulnerabilities in Microsoft's authentication protocol, particularly in how Windows handles credentials in memory. Although Microsoft has since introduced various mitigations, Mimikatz remains a critical tool in penetration testing and post-exploitation scenarios. Available on [GitHub](https://github.com/ParrotSec/mimikatz).
+
+##### Use Cases
+* Mimikatz excels in post-exploitation situations, where an attacker has already gained access to a system and seeks to elevate privileges or move laterally across a network. Here are some common use cases:
+  * **Credential extraction**: Using the `sekurlsa::logonpasswords` module, attackers can steal plaintext passwords, hashes, and Kerberos tickets for all logged-in users, which can be used for further attacks.
+  * **Pass-the-hash (PTH) attacks**: Once an NTLM 
