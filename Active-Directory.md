@@ -30,4 +30,13 @@
 ##### Use Cases
 * Mimikatz excels in post-exploitation situations, where an attacker has already gained access to a system and seeks to elevate privileges or move laterally across a network. Here are some common use cases:
   * **Credential extraction**: Using the `sekurlsa::logonpasswords` module, attackers can steal plaintext passwords, hashes, and Kerberos tickets for all logged-in users, which can be used for further attacks.
-  * **Pass-the-hash (PTH) attacks**: Once an NTLM 
+  * **Pass-the-hash (PTH) attacks**: Once an NTLM hash is acquired, Mimikatz's `sekuralsa::pth` module can be used to authenticate to other systems without needing the plaintext password.
+  * **Golden and Silver tickets**: Attackers can forge Keberos tickets to maintain persistence within a network. These tickets are difficult to detect and provide broad, long-term access to a domain.
+ 
+ ##### Mimikatz Modules
+ * Mimikatz is structured around different modules, each serving a specific function in extracting or manipulating data from a Windows system. These modules allow users to target specific aspects of system security, such as authentication tokens, credentials, or encrypted data. The Mimikatz module and command structure is as follows `module::command`. For example, if I wanted to see what the hostname of the machine was using Mimikatz, I could use the following module and command combination: `standard::hostname`.
+ * You can use `help` to review a list of basic commands. Commonly used modules:
+   * `sekurlsa`: This module is one of the most widely used in Mimikatz, `sekurlsa` (Security Local Security Authority) interacts with the system's memory to extract credentials, such as cleartext passwords, hashes, and Kerberos tickets. For instance, `sekurlsa::logonpasswords` command retrieves password information for all logged-in users.
+   * `kerberos`: Used to manipulate Kerberos tickets, which are essential for authentication in Windows networks. Attackers can use commands like `kerberos::golden` to create golden tickets or `kerberos::list` to display available Kerberos tickets.
+   * `lsadump`: Extracts sensitive information, such as credentials and security policies, from the Local Security Authority (LSA). A common command is `lsadump::sam` for dumping password hashes from the Security Account Manager (SAM).
+   * `privilege`: Crucial for elevating permissions within Mimikatz. Running `privilege::debug` grants the tool the necessary privileges to access restricted memory areas and perform many of its core functions. 
