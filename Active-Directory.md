@@ -77,5 +77,16 @@
    * Another place where PowerUp will check for is an adminstrator pass in either of these two paths: `C:\Windows\Panter\Unattend.xml` and `C:\Windows\Panther\Unattend\Unattend.xml`. In large scale deployments, unattended installations of Windows operating systems are necessary. System admins can set up admin passwords in these files. If improperly cleaned up at the end of installation, they can provide malicious users with the means to gain admin privileges over the target host.
 
 #### Offensive PowerShell: Privilege Escalation with PowerUp
-* PowerUp is a PowerShell tool which is a part of the PowerSploit framework, a set of Microsoft powerShell modules that can be used to aid penetration testers during all phases of an assessment. More can be found at the [GitHub](https://github.com/PowerShellMafia/PowerSploit).
-* 
+* PowerUp is a PowerShell tool which is a part of the PowerSploit framework, a set of Microsoft PowerShell modules that can be used to aid penetration testers during all phases of an assessment. More can be found at the [GitHub](https://github.com/PowerShellMafia/PowerSploit).
+* PowerUp automates the enumeration process and carries out checks mainly targeted at identifying common misconfigurations that could allow privilege escalation. Here are some techniques employed by PowerUp:
+  * **Sevice enumeration**: Identifies user-configurable services that could be exploited for privilege escalation.
+  * **Unquoted service paths**: Checks for services with unquoted file paths, which can lead to privilege escalation if the path contains whitespace.
+    * Need to come back to *Lab: Privilege Escalation: Windows – Unquoted Service Paths*. 
+  * **DLL hijacking**: Uncover insecure DLL loading that could be exploited for privilege escalation.
+  * **Modifiable registry AutoRuns**: PowerUp identifies registry AutoRuns (programs automatically started by Windows) that can be modified by non-privileged users, potentially leading to arbitrary code execution with escalated privileges.
+  * **AlwaysInstallElevated policy**: Checks if the registry policy 'AlwaysInstallElevated' is enabled, which could allow a non-privileged user to install Microsoft Windows Installer Package Files (MSI) with elevated (SYSTEM) permissions.
+  * **Modifiable service binaries**: Identifies services where the current user context has permission to modify binaries, allowing a user to potentially execute code as SYSTEM.
+  * **Unattended install files**: Checks for leftover unattended installation files that might still have administrator credentials within them.
+  * **Group Policy Preferences password**: Examines Group Policy Preferences (GPP) files for any stored credentials.
+  * **Cached GPP passwowrd**: Checks for any cached GPP passwords.
+  * **Named pipe impersonation**: Checks for named pipe client impersonation opportunity, which can be leveraged to escalate privileges. 
