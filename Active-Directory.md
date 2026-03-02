@@ -7,7 +7,7 @@
   * Gaining access to the DC via DA credentials gives you ultimate control over an entire network domain. It facilitates moving through a network and performing administrative tasks unrestricted to exploit the system while appearing as a legitimate user.
 <div align="center"><img width="551" height="516" alt="image" src="https://github.com/user-attachments/assets/97552527-d8aa-4aa6-b158-bd044d07af72" /></div>
 
-## Introduction to Active Directory Attack Techniques
+## Introduction to Active Directory Attacks Overview
 ### Password Attacks
 * After gaining initial access to a Windows system, local and domain plaintext or hashed passwords on your target can be the key to privilege escalation and lateral movement.
   * Local passwords can be stored in various locations, such as in files and folders, and in the Windows registry, such as the SAM, SYSTEM, and SECURITY registry hives. The Local Security Authority Subsystem (LSASS) is a common place to find either local or domain passwords, but you can also find domain passwords within a Group Policy Preference (GPP).
@@ -65,4 +65,13 @@
 * BloodHound is a reconnaissance tool that allows you to graphically view an AD environment's user permissions, hidden relationships, sessions, and attack paths within a domain. With this, you can expose ways to escalate privileges and move laterally across the network.
 
 ### SharpHound
-* SharpHound is BloodHound's data collector counterpart and is used to ingest data from the AD environments, which can then be analyzed in BloodHound. SharpHound enumerates the AD environment, collecting valuable information about users, groups, group memberships, organizational units, permissions, and more. The data is then processed by BloodHound, which graphically represents the complex relationships within the system. 
+* SharpHound is BloodHound's data collector counterpart and is used to ingest data from the AD environments, which can then be analyzed in BloodHound. SharpHound enumerates the AD environment, collecting valuable information about users, groups, group memberships, organizational units, permissions, and more. The data is then processed by BloodHound, which graphically represents the complex relationships within the system.
+
+## Local Passwords
+* When landing on a Windows system as a result of initial access, your next steps will involve some sort of privilege escalation or lateral movement. Often, both of these techniques will rely on harvesting passwords from your target environment to accomplish this.
+* Passwords can be found on your target host in various locations, including common places, such as the Windows registry, and uncommon places such as files and folders, the Security Account Manager (SAM), SYSTEM, SECURITY, and LSASS.
+
+### Common Places
+* **PowerUp**: Common local escalation tool is PowerUp.ps1 which searches for passwords in common places, including the Windows registry and unattended files. To use PowerUp, you'll first need to transfer it onto the target host and import the module in PS with `Import-Module .\PowerUp.ps1`. You can then execute it with `Invoke-AllChecks`. PowerUp will then search for the host for any passwords.
+   * One specific location PowerUp checks is the registry. For example, it queries the following key to check for autologon credentials: `HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CUrrentversion\Winlogon`. Without PowerUp, you can check this manually by running the following command from a terminal: `reg query "HKLM\Software\Microsoft\Windows NT\Currentversion\Winlogon"`.
+   * Another place where PowerUp will check for is an adminstrator pass in either of these two paths: `C:\Windows\Panter\Unattend.xml` and `C:\Windows\Panther\Unattend\Unattend.xml`. In large scale deployments, unattended installations of Windows operating systems are necessary. System admins can set up admin passwords in these files. If improperly cleaned up at the end of installation, they can provide malicious users with the means to gain admin privileges over the target host.  
