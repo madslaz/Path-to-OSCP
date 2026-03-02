@@ -53,7 +53,7 @@
 * **Security identifier (SID)**: Used to identify a security principal or security group. Can represent any entity that the OS can authenticate. Examples include a user account, a computer account, or a thread or process that runs in the security context of a user or a computer account. For more, see [this](https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/manage/understand-security-identifiers).
 
 ### PsExec
-* The PsExec tool is a part of the Sysinternals Suite that allows users to launch an interactive command prompt on a remote system, execute processes, and redirect the output to the local system. It can be explouted to gain unauthorized access to other machines, such as with a pass-the-hash attack or with Chisel and Proxychains.
+* The PsExec tool is a part of the Sysinternals Suite that allows users to launch an interactive command prompt on a remote system, execute processes, and redirect the output to the local system. It can be exploited to gain unauthorized access to other machines, such as with a pass-the-hash attack or with Chisel and Proxychains.
 
 ### Chisel
 * Chisel is a powerful open-source tool that creates a TCP/UDP tunnel that's transported over HTTP and secured via SSH. It's used for port forwarding, passing through firewalls, and securing communications between machines. For AD, you can use Chisel to access internal networks by creating a network bridge between an attacking machine and a compromised machine. This allows you to access a previously inaccessible machine. 
