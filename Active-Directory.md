@@ -62,4 +62,7 @@
 * `proxychains` is a tool designed to reroute traffic for TCP-based applications. It can be combined with Chisel to access an internal network via a compromised machine. With `proxychains`, you can create a SOCKS5 proxy to reroute traffic through the secure connection you've created with Chisel, making the traffic appear legitimate to gain access to the internal network.
 
 ### BloodHound
-* BloodHound is a reconnaissance tool that allows you to graphically view an AD environment's user permissions, hidden relationships, sessions, and attack paths within a domain. With this, you can expose ways to escalate privileges and move laterally across the network. 
+* BloodHound is a reconnaissance tool that allows you to graphically view an AD environment's user permissions, hidden relationships, sessions, and attack paths within a domain. With this, you can expose ways to escalate privileges and move laterally across the network.
+
+### SharpHound
+* SharpHound is BloodHound's data collector counterpart and is used to ingest data from the AD environments, which can then be analyzed in BloodHound. SharpHound enumerates the AD environment, collecting valuable information about users, groups, group memberships, organizational units, permissions, and more. The data is then processed by BloodHound, which graphically represents the complex relationships within the system. 
