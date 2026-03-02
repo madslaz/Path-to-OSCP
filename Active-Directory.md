@@ -88,7 +88,7 @@
   * **Modifiable service binaries**: Identifies services where the current user context has permission to modify binaries, allowing a user to potentially execute code as SYSTEM.
   * **Unattended install files**: Checks for leftover unattended installation files that might still have administrator credentials within them.
   * **Group Policy Preferences password**: Examines Group Policy Preferences (GPP) files for any stored credentials.
-  * **Cached GPP passwowrd**: Checks for any cached GPP passwords.
+  * **Cached GPP password**: Checks for any cached GPP passwords.
   * **Named pipe impersonation**: Checks for named pipe client impersonation opportunity, which can be leveraged to escalate privileges. 
 
 ##### Functions
