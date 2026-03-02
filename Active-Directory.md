@@ -23,7 +23,7 @@
 ### Mimikatz
 * If you need to dump domain passwords, Mimikatz is a powerful tool. It's designed to extract plaintext passwords, hashes, PIN codes, and Kerberos tickets from memory. It works particularly well with extracting from the LSASS process as it can effectively access it to obtain encrypted data, such as user passwords and access tokens. After extracting plaintext or NTLM password hashes, you can use Mimikatz to spawn processes or run DCSync attacks to impersonate the DC with the KRBTGT (Kerberos Ticket-Granting Ticket) hash.
 
-#### LAB: Introduction to Mimikatz
+#### Introduction to Mimikatz
 * Mimikatz is an open-source post-exploitation tool designed for Windows systems. It allows attackers to extract sensitive authentication data such as passwords, tokens, and hashes directly from a system's memory. These extracted credentials can then be used in offline password-cracking attacks or leveraged for further network exploitation, such as pass-the-hash, pass-the-ticket, or even generating Golden Kerberos tickets, which provide extended access to systems.
 * Initially developed by Benjamin Delpy as a proof of concept, Mimikatz was created to demonstrate the vulnerabilities in Microsoft's authentication protocol, particularly in how Windows handles credentials in memory. Although Microsoft has since introduced various mitigations, Mimikatz remains a critical tool in penetration testing and post-exploitation scenarios. Available on [GitHub](https://github.com/ParrotSec/mimikatz).
 
@@ -43,4 +43,23 @@
    * `privilege`: Crucial for elevating permissions within Mimikatz. Running `privilege::debug` grants the tool the necessary privileges to access restricted memory areas and perform many of its core functions.
      * Before Mimikatz can interact with sensitive system memory and extract credential information, it first needs elevated permissions. This is where the `privilege::debug` module comes into play. On Windows, certain operations, like reading memory to extract credentials, require debug privileges. Running this command first is critical because it elevates the tool's permissions to enable many of its core functionalities.
      * Without first running this command, most of Mimikatz's modules and commands won't work effectively, as the system's security controls will block them. When the tool is executed with **administrator** or **SYSTEM**-level privileges, putting Mimikatz into debug mode allows it to bypass these restrictions, granting access to the sensitive data stored in memory that Windows uses to authenticate users.
-     * Executing `privilege::debug` should result in `Privilege '20' OK'`, confirming that Mimikatz is ready to access the necessary system functions that handle passwords, tokens, and Kerberos tickets. 
+     * Executing `privilege::debug` should result in `Privilege '20' OK'`, confirming that Mimikatz is ready to access the necessary system functions that handle passwords, tokens, and Kerberos tickets.
+
+##### LAB: Introduction to Mimikatz
+* **Task 4**: `log` can be used to log Mimikatz input/output to a file
+* **Task 5**: Hostname of base computer found with `standard::hostname``
+* **Task 6**: Put Mimikatz into debug mode with `privilege::debug`. Successful return is `Privilege '20' OK`.
+* **Task 8**: Used `sekurlsa::logonpasswords` to retrieved the hash of all users who have logged in locally.
+* **Security identifier (SID)**: Used to identify a security principal or security group. Can represent any entity that the OS can authenticate. Examples include a user account, a computer account, or a thread or process that runs in the security context of a user or a computer account. For more, see [this](https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/manage/understand-security-identifiers).
+
+### PsExec
+* The PsExec tool is a part of the Sysinternals Suite that allows users to launch an interactive command prompt on a remote system, execute processes, and redirect the output to the local system. It can be explouted to gain unauthorized access to other machines, such as with a pass-the-hash attack or with Chisel and Proxychains.
+
+### Chisel
+* Chisel is a powerful open-source tool that creates a TCP/UDP tunnel that's transported over HTTP and secured via SSH. It's used for port forwarding, passing through firewalls, and securing communications between machines. For AD, you can use Chisel to access internal networks by creating a network bridge between an attacking machine and a compromised machine. This allows you to access a previously inaccessible machine. 
+
+### Proxychains
+* `proxychains` is a tool designed to reroute traffic for TCP-based applications. It can be combined with Chisel to access an internal network via a compromised machine. With `proxychains`, you can create a SOCKS5 proxy to reroute traffic through the secure connection you've created with Chisel, making the traffic appear legitimate to gain access to the internal network.
+
+### BloodHound
+* BloodHound is a reconnaissance tool that allows you to graphically view an AD environment's user permissions, hidden relationships, sessions, and attack paths within a domain. With this, you can expose ways to escalate privileges and move laterally across the network. 
