@@ -111,13 +111,13 @@
        * `Get-RegistryAlwaysInstallElevated`: checks if the AlwaysInstallElevated registry key is set.
        * `Get-RegistryAutoLogon`: checks for Autologon credentials in the registry.
        * `Get-ModifiableRegistryAutoRun`: checks for any modifiable binaries/scripts (or their configs) in HKLM (HKEY_LOCAL_MACHINE is a primary hive in the Windows Registry containing machine-wide configuration settings for hardware, software, and the OS. Essential for system stability) autoruns.
-      * Miscellaneous Checks:
-        * `Get-ModifiableScheduledTaskFile`: find schtasks with modifiable target files.
-        * `Get-UnattendedInstallFile`: finds remaining unattended installation files.
-        * `Get-Webconfig`: checks for any encrypted web.config strings.
-        * `Get-ApplicationHost`: checks for encrypted application pool and virtual directory passwords.
-        * `Get-SiteLitePassword`: retrieves the plaintext passwords for any found in McAfee's SiteList.xml files.
-      * Other Functions:
+     * Miscellaneous Checks:
+       * `Get-ModifiableScheduledTaskFile`: find schtasks with modifiable target files.
+       * `Get-UnattendedInstallFile`: finds remaining unattended installation files.
+       * `Get-Webconfig`: checks for any encrypted web.config strings.
+       * `Get-ApplicationHost`: checks for encrypted application pool and virtual directory passwords.
+       * `Get-SiteLitePassword`: retrieves the plaintext passwords for any found in McAfee's SiteList.xml files.
+     * Other Functions:
         * `Get-ModifiablePath`: tokenizes an input string and returns the files in it that the current user can modify.
         * `Get-CurrentUserTokenGroupSid`: returns all SIDs that the current user is a part of, whether they're disabled or not.
         * `Add-ServiceDacl`: adds a DACL field to a service object returned by Get-Service.
