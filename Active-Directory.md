@@ -121,6 +121,7 @@
         * `Get-ModifiablePath`: tokenizes an input string and returns the files in it that the current user can modify.
         * `Get-CurrentUserTokenGroupSid`: returns all SIDs that the current user is a part of, whether they're disabled or not.
         * `Add-ServiceDacl`: adds a DACL field to a service object returned by Get-Service.
+          * A DACL (Discretionary Access Control List) is essentially the "who can do what" list for an object in Windows. Every file, folder, and service has one. It consists of Access Control Entities (ACEs) which might say User A has "Read" permissions, Admins have "Full Control" and Interactive Users have "Start/Stop" permissions. 
         * `Set-ServiceBinPath`: sets the binary path for a service to a specified value through Win32 API methods.
         * `Test-ServiceDaclPermission`: tests one or more passed services or service names against a given permission set.
         * `Write-UserAddMSI`: writes out an MSI installer that prompts for a user to be added.
