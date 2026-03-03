@@ -117,11 +117,11 @@
         * `Get-Webconfig`: checks for any encrypted web.config strings.
         * `Get-ApplicationHost`: checks for encrypted application pool and virtual directory passwords.
         * `Get-SiteLitePassword`: retrieves the plaintext passwords for any found in McAfee's SiteList.xml files.
-       * Other Functions:
-         * `Get-ModifiablePath`: tokenizes an input string and returns the files in it that the current user can modify.
-         * `Get-CurrentUserTokenGroupSid`: returns all SIDs that the current user is a part of, whether they're disabled or not.
-         * `Add-ServiceDacl`: adds a DACL field to a service object returned by Get-Service.
-         * `Set-ServiceBinPath`: sets the binary path for a service to a specified value through Win32 API methods.
-         * `Test-ServiceDaclPermission`: tests one or more passed services or service names against a given permission set.
-         * `Write-UserAddMSI`: writes out an MSI installer that prompts for a user to be added.
-         * `Invoke-AllChecks`: runs all current enumeration checks and returns a report. 
+      * Other Functions:
+        * `Get-ModifiablePath`: tokenizes an input string and returns the files in it that the current user can modify.
+        * `Get-CurrentUserTokenGroupSid`: returns all SIDs that the current user is a part of, whether they're disabled or not.
+        * `Add-ServiceDacl`: adds a DACL field to a service object returned by Get-Service.
+        * `Set-ServiceBinPath`: sets the binary path for a service to a specified value through Win32 API methods.
+        * `Test-ServiceDaclPermission`: tests one or more passed services or service names against a given permission set.
+        * `Write-UserAddMSI`: writes out an MSI installer that prompts for a user to be added.
+        * `Invoke-AllChecks`: runs all current enumeration checks and returns a report. 
