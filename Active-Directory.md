@@ -141,7 +141,7 @@
 ### Uncommon Places
 * While PowerUp's automated checks search for cleartext passwords, it doesn't look everywhere. Keep in mind that people often leave credentials in files. Manually browsing every folder and reading each file is time-consuming, but PowerShell offers a handy alternative. For example, the following command recursively searches the whole C:\ drive for a specific keyword in the file name: `Get-ChildItem -Path "C:\" -Recurse -Filter "*keyword*" -ErrorAction SilentlyContinue -Force`. Alternatively, this command will recursively search for a keyword within all the files in the C:\ drive: `Get-ChildItem -Path "C:\" -Recurse -ErrorAction SilentlyContinue -Force | Select-String -Pattern "keyword`. Using these commands, you can search for keywords like `password, pass, username, user, credential, cred, secret, login`.
 
-#### SAM, SYSTEM, and SECURITY
+### SAM, SYSTEM, and SECURITY
 * The SAM (Security Account Manager) is a core Windows component that stores user account credentials in hashed formats. Its functionality relies on two other vital registry hives: SYSTEM and SECURITY. Together, they form a crucial trifecta in preservering system security and regulating access control.
   * **SAM**: Stores user accounts and hashed passwords
   * **SYSTEM**: Manages system configuration, including installed hardware and device drivers
@@ -171,3 +171,12 @@ iml-user:1000:aad3b435b51404eeaad3b435b51404ee:3b1b47e42e0463276e3ded6cef349f93:
     *  `aad3b435b51404eeaad3b435b51404ee` is the LM hash for empty password. Important to remember!
     *  Accounts with an SID of 5xx are system accounts, while accounts with 1xxx are created by the admin. In this example (`iml-user:1000:aad3b435b51404eeaad3b435b51404ee:3b1b47e42e0463276e3ded6cef349f93:::`), iml-user was added by an admin.
     *  You are the most interested in the NTLM hash most oftem, as it allows you to pass it to a system instead of a password. More on this later ...
+
+ ### LSASS and Mimikatz
+ * The LSASS (Local Security Authority Subsystem Service) in Windows plays a critical role in managing the system's security policy and handling user logins. However, examining LSASS while Windows is running involves a series of challenges, mostly due to its privileged status and built-in security mechanisms.
+ * In contast, using a tool like Mimikatz presents a practical method of accessing and analyzing LSASS data. Mimikatz is a utility designed to extract plaintext passwords, hashes, PIN codes, and Kerberos tickets from memory, particularly from LSASS process.
+   * While the system is operational, Mimikatz can effectively access LSASS, even obtaining encrypted data, such as user passwords and access tokens.
+   * In the example, Mimikatz obtained a session for user j.michaels on host CLIENT and was able to extract info from MSV, WDigest, and Kerberos Security Support Providers (SSP). You will rarely find WDigest enabled on a host in real life, but when you do, you hit the jackpot as that SSP holds the user's password in cleartext.
+  
+##### LAB: Active Directory Local Passwords
+
