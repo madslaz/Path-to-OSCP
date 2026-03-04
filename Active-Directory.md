@@ -168,5 +168,5 @@ WDAGUtilityAccount:504:aad3b435b51404eeaad3b435b51404ee:d7da45674bae3a0476c0f64b
 iml-user:1000:aad3b435b51404eeaad3b435b51404ee:3b1b47e42e0463276e3ded6cef349f93:::
 ```
   * Although LM hashes are no longer used, the empty LM hash is added to the user's hash for backward compatability reasons.
-  *  `aad3b435b51404eeaad3b435b51404ee` is the LM hash for empty password. Important to remember!
-  *  Accounts with an SID of 5xx are system accounts, while accounts with 1xxx are created by the admin. In this example (`iml-user:1000:aad3b435b51404eeaad3b435b51404ee:3b1b47e42e0463276e3ded6cef349f93:::`), iml-user was added by an admin.  
+   *  `aad3b435b51404eeaad3b435b51404ee` is the LM hash for empty password. Important to remember!
+   *  Accounts with an SID of 5xx are system accounts, while accounts with 1xxx are created by the admin. In this example (`iml-user:1000:aad3b435b51404eeaad3b435b51404ee:3b1b47e42e0463276e3ded6cef349f93:::`), iml-user was added by an admin.  
