@@ -178,5 +178,7 @@ iml-user:1000:aad3b435b51404eeaad3b435b51404ee:3b1b47e42e0463276e3ded6cef349f93:
    * While the system is operational, Mimikatz can effectively access LSASS, even obtaining encrypted data, such as user passwords and access tokens.
    * In the example, Mimikatz obtained a session for user j.michaels on host CLIENT and was able to extract info from MSV, WDigest, and Kerberos Security Support Providers (SSP). You will rarely find WDigest enabled on a host in real life, but when you do, you hit the jackpot as that SSP holds the user's password in cleartext.
   
-##### LAB: Active Directory Local Passwords
-
+### LAB: Active Directory Local Passwords
+* Setup: You will need to connect to the initial target using `xfreerdp /u:<username> /v:<Target IP> [/d:Domain] +clipboard +drives /drive:share,/home/kali /dynamic-resolution`
+* **Task 1**:
+* **Task 2**: To search recursively for a credentials file in `C:\Users`, I used `Get-ChildItem -Path "C:\Users" -Recurse -Filter "*cred*" -ErrorAction SilentlyContinue -Force`
