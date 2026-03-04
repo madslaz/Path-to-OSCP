@@ -180,5 +180,5 @@ iml-user:1000:aad3b435b51404eeaad3b435b51404ee:3b1b47e42e0463276e3ded6cef349f93:
   
 ### LAB: Active Directory Local Passwords
 * Setup: You will need to connect to the initial target using `xfreerdp /u:<username> /v:<Target IP> [/d:Domain] +clipboard +drives /drive:share,/home/kali /dynamic-resolution`
-* **Task 1**:
+* **Task 1**: `xfreerdp /u:j.holloway /v:10.102.137.48 +clipboard +drives /drive:share,/home/kali /dynamic-resolution`. 
 * **Task 2**: To search recursively for a credentials file in `C:\Users`, I used `Get-ChildItem -Path "C:\Users" -Recurse -Filter "*cred*" -ErrorAction SilentlyContinue -Force` first, but it said to use both, so I also tried `Get-ChildItem -Path "C:\Users| -Recurse -ErrorAction SilentlyContinue -Force | Select-String -Pattern "credential"`. The first returned way cleaner results because it returned PATHS with the keyword, while the second returned instances of that string - a lot of mess!
