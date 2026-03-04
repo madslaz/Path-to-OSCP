@@ -167,6 +167,7 @@ DefaultAccount:503:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c0
 WDAGUtilityAccount:504:aad3b435b51404eeaad3b435b51404ee:d7da45674bae3a0476c0f64b67121f7d:::
 iml-user:1000:aad3b435b51404eeaad3b435b51404ee:3b1b47e42e0463276e3ded6cef349f93:::
 ```
-  * Although LM hashes are no longer used, the empty LM hash is added to the user's hash for backward compatability reasons.
+  * Although LM hashes are no longer used (obsolete, insecure), the empty LM hash is added to the user's hash for backward compatability reasons.
     *  `aad3b435b51404eeaad3b435b51404ee` is the LM hash for empty password. Important to remember!
-    *  Accounts with an SID of 5xx are system accounts, while accounts with 1xxx are created by the admin. In this example (`iml-user:1000:aad3b435b51404eeaad3b435b51404ee:3b1b47e42e0463276e3ded6cef349f93:::`), iml-user was added by an admin.  
+    *  Accounts with an SID of 5xx are system accounts, while accounts with 1xxx are created by the admin. In this example (`iml-user:1000:aad3b435b51404eeaad3b435b51404ee:3b1b47e42e0463276e3ded6cef349f93:::`), iml-user was added by an admin.
+    *  You are the most interested in the NTLM hash most oftem, as it allows you to pass it to a system instead of a password. More on this later ...
