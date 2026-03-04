@@ -1,5 +1,5 @@
 ## Phase 1: The "Shell Dropper" (Web → Foothold)
-**Objective:** Move beyond finding bugs. Learn to upload/inject code to gain your first interactive system access via a Web Shell.
+**Objective:** Learn to upload/inject code to gain your first interactive system access via a Web Shell.
 
 | Machine | Difficulty | OS | Key Learning Objective | Completed? |
 | :--- | :--- | :--- | :--- | :--- | 
@@ -11,7 +11,7 @@
 ---
 
 ## Phase 2: Windows Internals & Local Escalation
-**Objective:** Master Windows-specific privilege escalation. Learn how to move from a "Web User" or "Service Account" to "SYSTEM."
+**Objective:** Learn how to move from a "Web User" or "Service Account" to "SYSTEM."
 
 | Machine | Difficulty | OS | Key Learning Objective | Completed? |
 | :--- | :--- | :--- | :--- |:--- | 
@@ -23,7 +23,7 @@
 ---
 
 ## Phase 3: Active Directory "Assumed Breach"
-**Objective:** Learn the logic of a Windows Domain. These labs focus on lateral movement and attacking the **Domain Controller (DC)**.
+**Objective:** These labs focus on lateral movement and attacking the **Domain Controller (DC)**.
 
 | Machine | Difficulty | OS | Key Learning Objective | Completed?| 
 | :--- | :--- | :--- | :--- |:--- | 
