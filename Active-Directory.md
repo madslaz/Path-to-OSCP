@@ -316,10 +316,17 @@ Primary:WDigest *
 ```
 
 ##### LAB: Kerberos: Golden and Silver Tickets
-* Silver tickets are aimed at service accounts. They allow an attacker to forge a TGS ticket for a specific service under any user account. For example, an MSSQL server only allows users that are part of the MSSQL group to log in. You can forge a silver ticket with this attack and connect to the MSSQL instance to retrieve sensitive data. To forge a silver ticket, you'll need:
+* Silver tickets are aimed at service accounts. They allow an attacker to forge a TGS (Ticket-Granting Service) ticket for a specific service under any user account. For example, an MSSQL server only allows users that are part of the MSSQL group to log in. You can forge a silver ticket with this attack and connect to the MSSQL instance to retrieve sensitive data. To forge a silver ticket, you'll need:
   * Domain security identifier (SID)
   * Domain fully qualified domain name (FQDN)
   * Service account's password hash
   * Username to impersonate
   * Service name
   * Target
+* Obtaining the data from active directory: to get the domain SID, run `whoami /user` in a command prompt under a domain user account. This will return an output that has the user security identifier. We can derive the domain SID from the user SID by removing the last four digits and the hyphen preceding them. The domain FQDN can be retrieved from a domain-joined machine by issuing the following command: `systeminfo | findstr /B /C:"Domain"`.
+* The service account's password hash is generally dumped from a machine or computed from the password after a successful Kerberoast attack, for example. For the purpose of this specific lab, the password hash of the **iis_service** account is provided. Finally, to get the service and target host, use the following: `setspn -L <service account name>`. The output is in the format `[service]/[target]`.
+* Once all the information is gathered, you can proceed to create your ticket. This lab uses Mimikatz to create tickets. First, we are going to log into workstation-01 with `xfreerdp /v:<Workstation-01 IP> /u:s.villanelle /d:krbtown /p:Summ3r2021! /dynamic-resolution +clipboard`. Then, we are going to use Mimikatz to create our ticket with the following placeholder command: `kerberos::golden /sid:<Domain SID> /domain:<Domain FQDN> /user:<The user to impersonate> /service:<The service we are trying to connect to> /target:<The target server> /rc4:<The password hash of the service account>`.
+* Lastly, you will use Rubeus to load the silver ticket created (`ticket.kirbi`) into your current session --> `Rubeus ptt /ticket:ticket.kirbi`. With all of this done correctly, you should be all good to use the service!
+  * Note: Mimikatz will add a very large expiration time for the ticket, which is one way that silver and golden tickets are detected.
+* Silver ticket tasks:
+  * Forge a TGS ticket issued by **iis_service** for the user **Administrator**. Use it to connect to **http://workstation-02.krbtown.local** and get the token. The website only allows users of the DAs group to visit it. You can assume you have already dumped the password hash for this account, which can be found in the Credentials panel. 
