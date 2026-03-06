@@ -354,4 +354,7 @@ Primary:WDigest *
 * The overall flow of the attack was using `get-GPPPassword.ps1` on the original target, `m.gibbs` --> receive username `NewAdmin` and password `PasswordInGPPIsNotSafe` from GPPPassword.ps1 --> log into New Admin --> run `sekurlsa::logonpasswords` and get j.russ, who is a DA --> connect as j.russ, run Mimikatz --> `lsadump::dcsync /user:ORCHID\krbtgt` for DCSync attack. 
 
 # Pass-the-Hash
-* PTH is a credential theft and lateral movement technique that involves stealing a user's hash password and using it to authenticate to other machines or services within a network. 
+* PTH is a credential theft and lateral movement technique that involves stealing a user's hash password and using it to authenticate to other machines or services within a network. You can authenticate without having to spend time and resourcecs decrypting the hash to reveal the plaintext password.
+* With the password hash, you can move laterally to previously unauthorized machines or use it to spawn processes with the stolen user's privileges for further domain exploitation. The password hash is usually stored as a New Technology LAN Manager (NTLM) hash, which can be extracted with tools like Mimikatz.
+  * Once obtained, you can use this hash with Mimikatz to spawn processes with the stolen privileges or run PsExec or Metasploit against more desirable targets, such as the Domain Controller.
+  * To use PTH tools, you'll need administrator privileges on your compromised machine. 
