@@ -367,5 +367,11 @@ Primary:WDigest *
 * This makes LSASS a prime target to exploit NTLM hashes from to use in a pass-the-hash attack.
 
 ## Mimikatz 
-* With local admin credentials, you'll be able to use Mimikatz to extract hashes (for example, from LSASS). As a quick recap, to do this, you need to run Mimikatz as an admin on your target and set debug privileges with `privilege::debug`.
-* 
+* With local admin credentials, you'll be able to use Mimikatz to extract hashes (for example, from LSASS). As a quick recap, to do this, you need to run Mimikatz as an admin on your target and set debug privileges with `privilege::debug`. User sessions can then be dumped with `sekurlsa::logonpasswords`. Once you've stolen the password hash, you can now use it to authenticate using a pass-the-hash technique. 
+
+## Pass-the-Hash with Mimikatz
+* With your NTLM hash, you can use the `sekurlsa::pth` command in Mimikatz to spawn a new process with the provided username and hash, and the process will open with the user's privileges. So, if you've stolen a Domain Admin hash, you'll now be able to open processes as the Domain Admin. To do this, use the following Mimikatz command with the stolen hash:
+```
+sekurlsa::pth /user:<username> /domain:<Domain> /ntlm:<NTLM Hash>
+```
+
