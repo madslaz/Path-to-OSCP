@@ -357,4 +357,11 @@ Primary:WDigest *
 * PTH is a credential theft and lateral movement technique that involves stealing a user's hash password and using it to authenticate to other machines or services within a network. You can authenticate without having to spend time and resourcecs decrypting the hash to reveal the plaintext password.
 * With the password hash, you can move laterally to previously unauthorized machines or use it to spawn processes with the stolen user's privileges for further domain exploitation. The password hash is usually stored as a New Technology LAN Manager (NTLM) hash, which can be extracted with tools like Mimikatz.
   * Once obtained, you can use this hash with Mimikatz to spawn processes with the stolen privileges or run PsExec or Metasploit against more desirable targets, such as the Domain Controller.
-  * To use PTH tools, you'll need administrator privileges on your compromised machine. 
+  * To use PTH tools, you'll need administrator privileges on your compromised machine.
+
+## NTLM Hashes
+* An NTLM hash is a crytopgrahic version of a user's password, used by Windows systems. NTLM hashes are stored in a DC's Security Accounts Manager (SAM) or New Technology Directory Services (NTDS) file.
+  * The hash consists of 32 hexadecimal characters, a mix of numbers (0-9) and letters (A-F). An example NTLM hash is `5CE25A953A0DCF5D32B7A6FEFC21DD18`.
+* While NTLM hashes provide a level of security by not storing plaintext passwords, the way these hashes are managed can be exploited. When a user logs into a machine, LSASS (Local Security Authority Subsystem Service) handles the authentication process and stores the user's NTLM hash into system memory. You can extract these hashes from LSASS memory and inject them back into the system through a system call to impersonate the user.
+  * In remote attacks, tools like PsExec exploit sevices like SMB (Server Message Block), which are designed to accept a hash instead of a password for authentication.
+* This makes LSASS a prime target to exploit NTLM hashes from to use in a pass-the-hash attack. 
