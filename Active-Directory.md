@@ -464,4 +464,13 @@ Exploit target:
 * **Goal**: Move laterally from the target to the domain controller using a pass-the-hash attack. You'll first need to find an NTLM hash by dumping logged-in users from LSASS on the target. Once you have the NTLM hash, you will then need to use Mimikatz or psexec.py to escalate your privileges and authenticate to DC. 
 * **Task 1**: `xfreerdp /v:10.102.45.217 /u:m.garza /dynamic-resolution +clipboard +drives /drive:share,/home/kali`
 * **Task 2**: Moved mimikatz.exe to target desktop through shared. Ran mimikatz.exe as admin --> `privilege::debug` --> `sekuralsa::logonpasswords`
-* **Task 3**: On attack box, Impacket `./psexec.py -hashes :<E.MILLER HASH> ORCHID/e.miller@<TARGET IP>`. I chose this NTLM hash because I noticed `e.miller` was logged into "DC01" and his SID began with 1, so it was created by an admin. I then navigated the file system for token file as instructed. 
+* **Task 3**: On attack box, Impacket `./psexec.py -hashes :<E.MILLER HASH> ORCHID/e.miller@<TARGET IP>`. I chose this NTLM hash because I noticed `e.miller` was logged into "DC01" and his SID began with 1, so it was created by an admin. I then navigated the file system for token file as instructed.
+
+# Lateral Movement
+* Lateral movement refers to the technique of moving around a network once you've gained initial access. As user accounts across the domain ofte have different levels of privileges and access, your goal is to escalate your privileges and move laterally to target DA or similar privileged accounts.
+* Moving horizontally allows you to expand your domain exploitation by gaining unauthorized access to different machines within the domain. Some of these machines may be part of an internal network, externally unreachable from your attacking machine yet internally accessible via a compromised domain-joined machine. Take the following network in the image below. A domain-joined machine (Machine 1) has been compromised and is accessble from an external network (Kali). However, the domain-joined machine is also in an internal network with an internal machine (Machine 2) that isn't accessible from the external network. 
+<img src="https://il-labforge-assets.origin.immersivelabs.team/uploads/EzRdQMeovoGvRLx7NmNVlzaKtD2TuFTonICJf_y-vC4.png"/><img width="544" height="220" alt="image" src="https://github.com/user-attachments/assets/70308564-6c3c-4e95-92a4-915fd5f159d9" />
+* Chisel, `proxychains`, and PsExec are some of the tools that can be used together to help you move laterally around a domain by creating tunnels to previously inaccessible domain machines and executing commands through them. 
+
+
+
