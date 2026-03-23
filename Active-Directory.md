@@ -470,7 +470,14 @@ Exploit target:
 * Lateral movement refers to the technique of moving around a network once you've gained initial access. As user accounts across the domain ofte have different levels of privileges and access, your goal is to escalate your privileges and move laterally to target DA or similar privileged accounts.
 * Moving horizontally allows you to expand your domain exploitation by gaining unauthorized access to different machines within the domain. Some of these machines may be part of an internal network, externally unreachable from your attacking machine yet internally accessible via a compromised domain-joined machine. Take the following network in the image below. A domain-joined machine (Machine 1) has been compromised and is accessble from an external network (Kali). However, the domain-joined machine is also in an internal network with an internal machine (Machine 2) that isn't accessible from the external network. 
 <img src="https://il-labforge-assets.origin.immersivelabs.team/uploads/EzRdQMeovoGvRLx7NmNVlzaKtD2TuFTonICJf_y-vC4.png"/><img width="544" height="220" alt="image" src="https://github.com/user-attachments/assets/70308564-6c3c-4e95-92a4-915fd5f159d9" />
-* Chisel, `proxychains`, and PsExec are some of the tools that can be used together to help you move laterally around a domain by creating tunnels to previously inaccessible domain machines and executing commands through them. 
+* Chisel, `proxychains`, and PsExec are some of the tools that can be used together to help you move laterally around a domain by creating tunnels to previously inaccessible domain machines and executing commands through them.
+
+## Chisel
+* Chisel is a powerful, open-source tool that creates a TCP/UDP tunnel that's transported over HTTP and secured via SSH. It's used for port forwarding, passing through firewalls, and securing communications between machines. The main component of Chisel are the server and client. The server listens for incoming client connections and creates a tunnel based on the client's request and the client connects to the server and requests a specific tunnel to be set up. Once the Chisel client and server are set up, you'll be able to use `proxychains` to access the internal domain machne with PsExec.
+
+### Reverse SOCKS Proxy
+* A reverse SOCKS proxy allows you to route traffic from a compromised machine back to your attacking machine. This allows your attacking machine to interact with your internal machine through the compromised machine, as the internal machne seens the connection as being from the legitimate compromised machine.
+* You can use Chisel to create a reverse SOCKS proxy, which creates a network bridge between the attacking machine and the compromised machine so yu can access this internal machine directly. You'll first need to install Chisel on your attacking machine (server) and your initial compromised machine (client). You can set up the Chisel server on the attacking machine with `chisel server -p 8000 --reverse`. 
 
 
 
