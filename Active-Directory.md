@@ -496,7 +496,16 @@ Exploit target:
 2025/03/11 13:49:32 server: Listening on http://0.0.0.0:8000
 2025/03/11 14:50:58 server: session#1: tun: proxy#R:127.0.0.1:1080=>socks: Listening
 ```
+## ProxyChains
+* ProxyChains is a tool designed to reroute traffic for TCP-based applications through proxy servers and supports various protocols, including SOCKS5. You can use `proxychains` to reroute traffic through the secure connection you've created with Chisel, making the traffic appear legitimate to gain access to the internal network.
 
+### ProxyChains Configuration
+* Based on your attacking machine, you'll first need to configure the SOCKS5 proxy. As the proxy is listening on the default SOCKS5 proxy port (1080), you need to open a new terminal and edit the `proxychains.conf` file: `sudo nano /etc/proxychains.conf`. Scroll down to the bottom of the file and add the following line to configure SOCKS5 on your localhost and listen on port 1080: `socks5 127.0.0.1 1080`. Save and close the file once modified and `proxychains` is now ready to be used! Going back to the example, this is how the connection now looks like below. A tunnel has been created between the attacking machine and the internal machine, which allows commands from the server to appear as if they are coming from the client:
+<img width="544" height="220" alt="SR0PJxiZzf_kv39rCP2pRH1kL3tpNxMd0sUEyq1E9uk" src="https://github.com/user-attachments/assets/e25920c1-36c4-4e49-a21a-5c3387ea9d3a" />
+* To make a command run through a proxy using `proxychains`, simply prepend the command with `proxychains`. For example, `proxychians nmap -Pn <Internal machine IP>`. This means the command will be run against a target on your attacking machine, but it will appear as if it was running from your client machine.
+
+## PsExec
+* PsExec is a command-line tool that allows you to remotely execute commands on other machines without needing a remote desktop or terminal session. With your Chisen tunnel and `proxychains` rerouting traffic, you'll now be bale to reach the internal network with PsExec. The syntax for running this command is: `proxychains ./psexec.py <Domain>/<Username>:<Password>@<Internal Machine IP>`.
 
 
 
